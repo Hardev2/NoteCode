@@ -1,4 +1,6 @@
-import Editor from "react-simple-code-editor";
+import EditorImport from "react-simple-code-editor";
+
+const Editor = EditorImport.default ?? EditorImport;
 import { highlight, languages } from "prismjs";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
