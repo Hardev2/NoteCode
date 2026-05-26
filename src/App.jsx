@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import CollapsibleSection from "./components/CollapsibleSection";
 import FolderSection from "./components/FolderSection";
 
 const storageKey = "notecode.notes.v1";
@@ -139,6 +140,22 @@ export default function App() {
   const [activeId, setActiveId] = useState(notes[0]?.id ?? null);
   const [copiedBlockId, setCopiedBlockId] = useState("");
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [collapsedSectionIds, setCollapsedSectionIds] = useState(() => new Set());
+
+  const toggleSectionCollapsed = (sectionId) => {
+    setCollapsedSectionIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) next.delete(sectionId);
+      else next.add(sectionId);
+      return next;
+    });
+  };
+
+  const sectionPreview = (content) => {
+    const line = (content || "").split("\n").find((l) => l.trim()) ?? "";
+    if (!line) return "Empty";
+    return line.length > 72 ? `${line.slice(0, 72)}…` : line;
+  };
 
   const activeNote = useMemo(
     () => notes.find((note) => note.id === activeId) ?? null,
@@ -294,24 +311,28 @@ export default function App() {
   };
 
   const renderSection = (section) => {
+    const collapsed = collapsedSectionIds.has(section.id);
+
     if (section.type === "label") {
       return (
-        <div
+        <CollapsibleSection
           key={section.id}
-          className="overflow-hidden rounded-lg border border-stone-300/70 bg-stone-50/90 shadow-sm dark:border-slate-700 dark:bg-slate-900/50"
-        >
-          <div className="flex items-center justify-between gap-2 border-b border-stone-200/80 px-3 py-2 dark:border-slate-700/80">
-            <span className="text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-slate-400">
-              Text
-            </span>
+          label="Text"
+          collapsed={collapsed}
+          onToggle={() => toggleSectionCollapsed(section.id)}
+          preview={sectionPreview(section.content)}
+          shellClassName="overflow-hidden rounded-lg border border-stone-300/70 bg-stone-50/90 shadow-sm dark:border-slate-700 dark:bg-slate-900/50"
+          headerClassName="flex items-center justify-between gap-2 border-b border-stone-200/80 px-3 py-2 dark:border-slate-700/80"
+          headerActions={
             <button
               type="button"
               onClick={() => deleteSection(activeNote.id, section.id)}
-              className="rounded-md border border-rose-300/60 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700 transition hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/60 dark:border-rose-900/60 dark:bg-rose-950/50 dark:text-rose-400 dark:hover:bg-rose-950/80 dark:focus-visible:ring-rose-500"
+              className="shrink-0 rounded-md border border-rose-300/60 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700 transition hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/60 dark:border-rose-900/60 dark:bg-rose-950/50 dark:text-rose-400 dark:hover:bg-rose-950/80 dark:focus-visible:ring-rose-500"
             >
               Remove
             </button>
-          </div>
+          }
+        >
           <textarea
             value={section.content}
             onChange={(e) => updateSection(activeNote.id, section.id, e.target.value)}
@@ -319,7 +340,7 @@ export default function App() {
             rows={Math.max(3, section.content.split("\n").length)}
             className="custom-scrollbar block w-full resize-y border-0 bg-transparent px-4 py-3 text-sm leading-relaxed text-stone-800 outline-none placeholder:text-stone-400 focus:ring-0 dark:text-slate-200 dark:placeholder:text-slate-500"
           />
-        </div>
+        </CollapsibleSection>
       );
     }
 
@@ -340,13 +361,16 @@ export default function App() {
     }
 
     return (
-      <div
+      <CollapsibleSection
         key={section.id}
-        className="overflow-hidden rounded-lg border border-stone-700/30 bg-[#1e1e1e] shadow-lg dark:border-slate-700/50 dark:bg-[#141414]"
-      >
-        <div className="flex items-center justify-between gap-2 border-b border-white/10 px-3 py-2">
-          <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Code</span>
-          <div className="flex items-center gap-2">
+        label="Code"
+        collapsed={collapsed}
+        onToggle={() => toggleSectionCollapsed(section.id)}
+        preview={sectionPreview(section.content)}
+        shellClassName="overflow-hidden rounded-lg border border-stone-700/30 bg-[#1e1e1e] shadow-lg dark:border-slate-700/50 dark:bg-[#141414]"
+        headerClassName="flex items-center justify-between gap-2 border-b border-white/10 px-3 py-2"
+        headerActions={
+          <div className="flex shrink-0 items-center gap-2">
             <button
               type="button"
               onClick={() => copyContent(section.content, section.id)}
@@ -362,7 +386,8 @@ export default function App() {
               Remove
             </button>
           </div>
-        </div>
+        }
+      >
         <textarea
           value={section.content}
           onChange={(e) => updateSection(activeNote.id, section.id, e.target.value)}
@@ -371,7 +396,7 @@ export default function App() {
           className="custom-scrollbar block w-full resize-y border-0 bg-transparent px-4 py-4 font-mono text-sm leading-6 text-slate-100 outline-none placeholder:text-slate-500 focus:ring-0"
           style={{ minHeight: "140px" }}
         />
-      </div>
+      </CollapsibleSection>
     );
   };
 
