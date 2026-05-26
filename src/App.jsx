@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import CodeBlockEditor, { normalizeCodeLanguage } from "./components/CodeBlockEditor";
 import CollapsibleSection from "./components/CollapsibleSection";
 import FolderSection from "./components/FolderSection";
 
@@ -48,10 +49,12 @@ function normalizeSection(section) {
     };
   }
 
+  const isCode = section.type === "code";
   return {
     id: section.id ?? crypto.randomUUID(),
-    type: section.type === "code" ? "code" : "label",
+    type: isCode ? "code" : "label",
     content: typeof section.content === "string" ? section.content : "",
+    ...(isCode ? { language: normalizeCodeLanguage(section.language) } : {}),
   };
 }
 
@@ -244,6 +247,12 @@ export default function App() {
     );
   };
 
+  const patchSection = (noteId, sectionId, patch) => {
+    mapSections(noteId, (section) =>
+      section.id === sectionId ? { ...section, ...patch } : section
+    );
+  };
+
   const deleteSection = (noteId, sectionId) => {
     setNotes((prev) =>
       prev.map((note) =>
@@ -370,7 +379,22 @@ export default function App() {
         shellClassName="overflow-hidden rounded-lg border border-stone-700/30 bg-[#1e1e1e] shadow-lg dark:border-slate-700/50 dark:bg-[#141414]"
         headerClassName="flex items-center justify-between gap-2 border-b border-white/10 px-3 py-2"
         headerActions={
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            <select
+              value={section.language || "javascript"}
+              onChange={(e) =>
+                patchSection(activeNote.id, section.id, { language: e.target.value })
+              }
+              title="Syntax highlighting language"
+              className="rounded-md border border-slate-600 bg-slate-800 px-2 py-1 text-xs font-medium text-slate-200 outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+            >
+              <option value="javascript">JavaScript</option>
+              <option value="html">HTML</option>
+              <option value="css">CSS</option>
+              <option value="json">JSON</option>
+              <option value="python">Python</option>
+              <option value="bash">Bash</option>
+            </select>
             <button
               type="button"
               onClick={() => copyContent(section.content, section.id)}
@@ -388,13 +412,11 @@ export default function App() {
           </div>
         }
       >
-        <textarea
+        <CodeBlockEditor
           value={section.content}
-          onChange={(e) => updateSection(activeNote.id, section.id, e.target.value)}
+          onChange={(content) => updateSection(activeNote.id, section.id, content)}
+          language={section.language}
           placeholder="Paste your code here..."
-          spellCheck={false}
-          className="custom-scrollbar block w-full resize-y border-0 bg-transparent px-4 py-4 font-mono text-sm leading-6 text-slate-100 outline-none placeholder:text-slate-500 focus:ring-0"
-          style={{ minHeight: "140px" }}
         />
       </CollapsibleSection>
     );

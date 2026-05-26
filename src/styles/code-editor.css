@@ -1,0 +1,34 @@
+/* Prism theme (tomorrow) + editable overlay alignment */
+.code-block-editor {
+  display: block;
+  width: 100%;
+  background: transparent !important;
+  color: #ccc;
+}
+
+.code-block-editor textarea,
+.code-block-editor pre {
+  margin: 0;
+  padding: 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  tab-size: 2;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.code-block-editor textarea {
+  outline: none !important;
+  caret-color: #e2e8f0;
+}
+
+.code-block-editor textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+.code-block-editor pre {
+  pointer-events: none;
+}
