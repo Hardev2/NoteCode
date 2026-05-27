@@ -347,7 +347,7 @@ export default function App() {
             onChange={(e) => updateSection(activeNote.id, section.id, e.target.value)}
             placeholder="Type your label or note text here..."
             rows={Math.max(3, section.content.split("\n").length)}
-            className="custom-scrollbar block w-full resize-y border-0 bg-transparent px-4 py-3 text-sm leading-relaxed text-stone-800 outline-none placeholder:text-stone-400 focus:ring-0 dark:text-slate-200 dark:placeholder:text-slate-500"
+            className="custom-scrollbar text-lg font-bold block w-full resize-y border-0 bg-transparent px-4 py-3 leading-relaxed text-stone-800 outline-none placeholder:text-stone-400 focus:ring-0 dark:text-slate-200 dark:placeholder:text-slate-500"
           />
         </CollapsibleSection>
       );
