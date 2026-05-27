@@ -487,9 +487,9 @@ export default function App() {
           </div>
         </aside>
 
-        <main className="custom-scrollbar flex min-w-0 flex-1 flex-col overflow-y-auto bg-stone-100/80 px-6 py-8 dark:bg-slate-950">
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-stone-100/80 dark:bg-slate-950">
           {!activeNote ? (
-            <div className="grid h-full place-items-center text-center text-stone-500 dark:text-slate-500">
+            <div className="grid h-full place-items-center px-6 py-8 text-center text-stone-500 dark:text-slate-500">
               <div>
                 <p className="mb-2 text-lg text-stone-700 dark:text-slate-300">No note selected</p>
                 <p className="text-sm">Create a note from the sidebar.</p>
@@ -497,44 +497,48 @@ export default function App() {
             </div>
           ) : (
             <>
-              <div className="mb-6 flex flex-wrap items-center gap-3">
-                <input
-                  value={activeNote.title}
-                  onChange={(e) => updateNote(activeNote.id, { title: e.target.value })}
-                  placeholder="Note title"
-                  className="min-w-52 flex-1 border-0 bg-transparent text-xl font-semibold uppercase tracking-wide text-stone-800 outline-none placeholder:text-stone-400 focus:ring-0 dark:text-slate-100 dark:placeholder:text-slate-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => addSection("label")}
-                  className="rounded-lg border border-stone-400/50 bg-stone-200/60 px-4 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400/80 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:focus-visible:ring-slate-500"
-                >
-                  + Text
-                </button>
-                <button
-                  type="button"
-                  onClick={() => addSection("code")}
-                  className="rounded-lg border border-stone-600 bg-stone-700 px-4 py-2 text-sm font-medium text-stone-100 transition hover:bg-stone-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 dark:border-slate-500 dark:bg-slate-700 dark:hover:bg-slate-600 dark:focus-visible:ring-slate-400"
-                >
-                  + Code block
-                </button>
-                <button
-                  type="button"
-                  onClick={() => addSection("folder")}
-                  className="rounded-lg border border-amber-500/70 bg-amber-600 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 dark:border-amber-700 dark:bg-amber-800 dark:hover:bg-amber-700"
-                >
-                  + Folder
-                </button>
+              <div className="z-10 shrink-0 border-b border-stone-300/70 bg-stone-100/95 px-6 py-4 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-950/95">
+                <div className="flex flex-wrap items-center gap-3">
+                  <input
+                    value={activeNote.title}
+                    onChange={(e) => updateNote(activeNote.id, { title: e.target.value })}
+                    placeholder="Note title"
+                    className="min-w-52 flex-1 border-0 bg-transparent text-xl font-semibold uppercase tracking-wide text-stone-800 outline-none placeholder:text-stone-400 focus:ring-0 dark:text-slate-100 dark:placeholder:text-slate-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => addSection("label")}
+                    className="rounded-lg border border-stone-400/50 bg-stone-200/60 px-4 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400/80 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:focus-visible:ring-slate-500"
+                  >
+                    + Text
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => addSection("code")}
+                    className="rounded-lg border border-stone-600 bg-stone-700 px-4 py-2 text-sm font-medium text-stone-100 transition hover:bg-stone-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 dark:border-slate-500 dark:bg-slate-700 dark:hover:bg-slate-600 dark:focus-visible:ring-slate-400"
+                  >
+                    + Code block
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => addSection("folder")}
+                    className="rounded-lg border border-amber-500/70 bg-amber-600 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 dark:border-amber-700 dark:bg-amber-800 dark:hover:bg-amber-700"
+                  >
+                    + Folder
+                  </button>
+                </div>
               </div>
 
-              <div className="flex w-full flex-col gap-5">
-                {activeNote.sections.length === 0 ? (
-                  <p className="rounded-lg border border-dashed border-stone-300/80 px-4 py-8 text-center text-sm text-stone-500 dark:border-slate-700 dark:text-slate-500">
-                    No sections yet. Add <strong>Text</strong>, <strong>Code</strong>, or a{" "}
-                    <strong>Folder</strong>.
-                  </p>
-                ) : null}
-                {activeNote.sections.map((section) => renderSection(section))}
+              <div className="custom-scrollbar flex-1 overflow-y-auto px-6 py-6">
+                <div className="flex w-full flex-col gap-5">
+                  {activeNote.sections.length === 0 ? (
+                    <p className="rounded-lg border border-dashed border-stone-300/80 px-4 py-8 text-center text-sm text-stone-500 dark:border-slate-700 dark:text-slate-500">
+                      No sections yet. Add <strong>Text</strong>, <strong>Code</strong>, or a{" "}
+                      <strong>Folder</strong>.
+                    </p>
+                  ) : null}
+                  {activeNote.sections.map((section) => renderSection(section))}
+                </div>
               </div>
             </>
           )}
