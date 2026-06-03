@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -10,10 +10,25 @@ import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
 import "../styles/docs-editor.css";
 
+const TEXT_COLORS = [
+  { label: "Default", value: null },
+  { label: "Red", value: "#dc2626" },
+  { label: "Blue", value: "#2563eb" },
+  { label: "Green", value: "#16a34a" },
+];
+
+const HIGHLIGHT_COLORS = [
+  { label: "Yellow", value: "#fef08a" },
+  { label: "Green", value: "#bbf7d0" },
+  { label: "Pink", value: "#fbcfe8" },
+  { label: "Clear", value: null },
+];
+
 function ToolbarButton({ onClick, active, disabled, title, children }) {
   return (
     <button
       type="button"
+      onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       disabled={disabled}
       title={title}
@@ -42,12 +57,20 @@ function DocsToolbar({ editor }) {
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
+  const applyTextColor = (color) => {
+    if (!color) editor.chain().focus().unsetColor().run();
+    else editor.chain().focus().setColor(color).run();
+  };
+
+  const applyHighlight = (color) => {
+    if (!color) editor.chain().focus().unsetHighlight().run();
+    else editor.chain().focus().setHighlight({ color }).run();
+  };
+
   return (
-    <div
-      className="flex flex-wrap items-center gap-0.5 border-b border-stone-200/80 bg-stone-200/50 px-2 py-1.5 dark:border-slate-700 dark:bg-slate-800/80"
-      onMouseDown={(e) => e.preventDefault()}
-    >
+    <div className="docs-toolbar flex flex-wrap items-center gap-0.5 border-b border-stone-200/80 bg-stone-200/50 px-2 py-1.5 dark:border-slate-700 dark:bg-slate-800/80">
       <select
+        data-docs-toolbar-control
         title="Heading style"
         className="docs-toolbar-btn h-7 min-w-[4.5rem] cursor-pointer border-0 bg-transparent text-xs font-medium outline-none"
         value={
@@ -59,6 +82,7 @@ function DocsToolbar({ editor }) {
                 ? "h3"
                 : "p"
         }
+        onMouseDown={(e) => e.stopPropagation()}
         onChange={(e) => {
           const v = e.target.value;
           if (v === "p") editor.chain().focus().setParagraph().run();
@@ -104,24 +128,35 @@ function DocsToolbar({ editor }) {
 
       <ToolbarDivider />
 
-      <label className="docs-toolbar-btn cursor-pointer" title="Text color">
-        <span className="text-base leading-none">A</span>
-        <input
-          type="color"
-          className="sr-only"
-          value={editor.getAttributes("textStyle").color || "#1c1917"}
-          onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
-        />
-      </label>
-      <label className="docs-toolbar-btn cursor-pointer" title="Highlight">
-        <span className="rounded-sm bg-amber-200 px-0.5 text-[10px] dark:bg-amber-600">▮</span>
-        <input
-          type="color"
-          className="sr-only"
-          value={editor.getAttributes("highlight").color || "#fef08a"}
-          onChange={(e) => editor.chain().focus().toggleHighlight({ color: e.target.value }).run()}
-        />
-      </label>
+      <span className="docs-toolbar-group" title="Text color">
+        {TEXT_COLORS.map((swatch) => (
+          <button
+            key={swatch.label}
+            type="button"
+            data-docs-toolbar-control
+            title={swatch.label}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => applyTextColor(swatch.value)}
+            className={`docs-color-swatch ${!swatch.value ? "docs-color-swatch--default" : ""}`}
+            style={swatch.value ? { backgroundColor: swatch.value } : undefined}
+          />
+        ))}
+      </span>
+
+      <span className="docs-toolbar-group" title="Highlight">
+        {HIGHLIGHT_COLORS.map((swatch) => (
+          <button
+            key={swatch.label}
+            type="button"
+            data-docs-toolbar-control
+            title={swatch.label}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => applyHighlight(swatch.value)}
+            className={`docs-color-swatch ${!swatch.value ? "docs-color-swatch--clear" : ""}`}
+            style={swatch.value ? { backgroundColor: swatch.value } : undefined}
+          />
+        ))}
+      </span>
 
       <ToolbarDivider />
 
@@ -181,7 +216,9 @@ function DocsToolbar({ editor }) {
 
       <ToolbarButton
         title="Clear formatting"
-        onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
+        onClick={() =>
+          editor.chain().focus().clearNodes().unsetAllMarks().unsetColor().unsetHighlight().run()
+        }
       >
         T̸
       </ToolbarButton>
@@ -200,10 +237,14 @@ export function docHtmlPreview(html) {
 }
 
 export default function DocsEditor({ value, onChange, placeholder = "Start writing…" }) {
+  const lastEmittedHtml = useRef(value ?? "");
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
+        bulletList: { keepMarks: true },
+        orderedList: { keepMarks: true },
       }),
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
@@ -214,26 +255,34 @@ export default function DocsEditor({ value, onChange, placeholder = "Start writi
       Placeholder.configure({ placeholder }),
     ],
     content: value || "",
-    onUpdate: ({ editor: ed }) => onChange(ed.getHTML()),
+    onUpdate: ({ editor: ed }) => {
+      const html = ed.getHTML();
+      lastEmittedHtml.current = html;
+      onChange(html);
+    },
     editorProps: {
       attributes: {
         class: "docs-editor-content",
+        spellcheck: "true",
       },
     },
   });
 
   useEffect(() => {
-    if (!editor || editor.isFocused) return;
-    const html = value || "";
-    if (html !== editor.getHTML()) {
-      editor.commands.setContent(html, { emitUpdate: false });
-    }
+    if (!editor) return;
+    const html = value ?? "";
+    if (html === lastEmittedHtml.current) return;
+    if (editor.isFocused) return;
+    editor.commands.setContent(html, { emitUpdate: false });
+    lastEmittedHtml.current = html;
   }, [value, editor]);
 
   return (
-    <div className="docs-editor overflow-hidden rounded-b-lg bg-white dark:bg-slate-900/60">
+    <div className="docs-editor">
       <DocsToolbar editor={editor} />
-      <EditorContent editor={editor} />
+      <div className="docs-editor-body">
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }

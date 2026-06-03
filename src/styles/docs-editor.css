@@ -1,28 +1,68 @@
+.docs-editor {
+  overflow: hidden;
+  border-radius: 0 0 0.5rem 0.5rem;
+  background: #fafaf9;
+}
+
+.dark .docs-editor {
+  background: rgb(15 23 42 / 0.6);
+}
+
+.docs-editor-body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: min(70vh, 32rem);
+}
+
+.docs-editor .tiptap,
 .docs-editor .ProseMirror {
-  min-height: 12rem;
+  min-height: 10rem;
   padding: 1rem 1.25rem;
   outline: none;
   color: #1c1917;
   font-size: 0.9375rem;
   line-height: 1.65;
+  word-break: break-word;
 }
 
+.dark .docs-editor .tiptap,
 .dark .docs-editor .ProseMirror {
   color: #e2e8f0;
 }
 
 .docs-editor .ProseMirror p {
-  margin: 0.5em 0;
+  margin: 0.35em 0;
 }
 
 .docs-editor .ProseMirror p:first-child {
   margin-top: 0;
 }
 
-.docs-editor .ProseMirror ul,
+.docs-editor .ProseMirror ul {
+  list-style-type: disc;
+  margin: 0.35em 0;
+  padding-left: 1.5rem;
+}
+
 .docs-editor .ProseMirror ol {
-  margin: 0.5em 0;
-  padding-left: 1.5em;
+  list-style-type: decimal;
+  margin: 0.35em 0;
+  padding-left: 1.5rem;
+}
+
+.docs-editor .ProseMirror li {
+  display: list-item;
+  margin: 0.15em 0;
+}
+
+.docs-editor .ProseMirror li p {
+  margin: 0;
+}
+
+.docs-editor .ProseMirror mark {
+  border-radius: 0.15em;
+  padding: 0.05em 0.15em;
+  color: inherit;
 }
 
 .docs-editor .ProseMirror h1 {
@@ -124,8 +164,57 @@
   height: 1.25rem;
   margin: 0 0.15rem;
   background: #d6d3d1;
+  flex-shrink: 0;
 }
 
 .dark .docs-toolbar-divider {
   background: #475569;
+}
+
+.docs-toolbar-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0 0.15rem;
+}
+
+.docs-color-swatch {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.2rem;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.docs-color-swatch--default {
+  background: linear-gradient(135deg, #1c1917 50%, #fafaf9 50%);
+}
+
+.dark .docs-color-swatch--default {
+  background: linear-gradient(135deg, #e2e8f0 50%, #334155 50%);
+}
+
+.docs-color-swatch--clear {
+  background: repeating-linear-gradient(
+    45deg,
+    #e7e5e4,
+    #e7e5e4 3px,
+    #fafaf9 3px,
+    #fafaf9 6px
+  );
+  position: relative;
+}
+
+.docs-color-swatch--clear::after {
+  content: "×";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #78716c;
 }

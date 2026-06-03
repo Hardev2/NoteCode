@@ -356,7 +356,7 @@ export default function App() {
             onChange={(e) => updateSection(activeNote.id, section.id, e.target.value)}
             placeholder="Type your label or note text here..."
             rows={Math.max(3, section.content.split("\n").length)}
-            className="custom-scrollbar block w-full resize-y border-0 bg-transparent px-4 py-3 text-xs font-normal leading-relaxed text-stone-800 outline-none placeholder:text-stone-400 focus:ring-0 dark:text-slate-200 dark:placeholder:text-slate-500"
+            className="custom-scrollbar block w-full resize-y border-0 bg-transparent px-4 py-3 text-lg font-normal leading-relaxed text-stone-800 outline-none placeholder:text-stone-400 focus:ring-0 dark:text-slate-200 dark:placeholder:text-slate-500"
           />
         </CollapsibleSection>
       );
@@ -370,7 +370,7 @@ export default function App() {
           collapsed={collapsed}
           onToggle={() => toggleSectionCollapsed(section.id)}
           preview={docHtmlPreview(section.content)}
-          shellClassName="overflow-hidden rounded-lg border border-blue-300/50 bg-white shadow-sm dark:border-blue-900/50 dark:bg-slate-900/50"
+          shellClassName="overflow-hidden rounded-lg border border-blue-300/50 bg-stone-50/90 shadow-sm dark:border-blue-900/50 dark:bg-slate-900/50"
           headerClassName="flex items-center justify-between gap-2 border-b border-stone-200/80 px-3 py-2 dark:border-slate-700/80"
           headerActions={
             <button
