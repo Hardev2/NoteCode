@@ -1,0 +1,131 @@
+.docs-editor .ProseMirror {
+  min-height: 12rem;
+  padding: 1rem 1.25rem;
+  outline: none;
+  color: #1c1917;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.dark .docs-editor .ProseMirror {
+  color: #e2e8f0;
+}
+
+.docs-editor .ProseMirror p {
+  margin: 0.5em 0;
+}
+
+.docs-editor .ProseMirror p:first-child {
+  margin-top: 0;
+}
+
+.docs-editor .ProseMirror ul,
+.docs-editor .ProseMirror ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.docs-editor .ProseMirror h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0.75em 0 0.35em;
+}
+
+.docs-editor .ProseMirror h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0.65em 0 0.3em;
+}
+
+.docs-editor .ProseMirror h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.5em 0 0.25em;
+}
+
+.docs-editor .ProseMirror a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.dark .docs-editor .ProseMirror a {
+  color: #60a5fa;
+}
+
+.docs-editor .ProseMirror blockquote {
+  border-left: 3px solid #d6d3d1;
+  margin: 0.5em 0;
+  padding-left: 1em;
+  color: #57534e;
+}
+
+.dark .docs-editor .ProseMirror blockquote {
+  border-left-color: #475569;
+  color: #94a3b8;
+}
+
+.docs-editor .ProseMirror p.is-editor-empty:first-child::before {
+  color: #a8a29e;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.dark .docs-editor .ProseMirror p.is-editor-empty:first-child::before {
+  color: #64748b;
+}
+
+.docs-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 0.35rem;
+  border-radius: 0.25rem;
+  border: none;
+  background: transparent;
+  color: #44403c;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.docs-toolbar-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.docs-toolbar-btn.is-active {
+  background: rgba(37, 99, 235, 0.15);
+  color: #1d4ed8;
+}
+
+.docs-toolbar-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.dark .docs-toolbar-btn {
+  color: #cbd5e1;
+}
+
+.dark .docs-toolbar-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dark .docs-toolbar-btn.is-active {
+  background: rgba(96, 165, 250, 0.2);
+  color: #93c5fd;
+}
+
+.docs-toolbar-divider {
+  width: 1px;
+  height: 1.25rem;
+  margin: 0 0.15rem;
+  background: #d6d3d1;
+}
+
+.dark .docs-toolbar-divider {
+  background: #475569;
+}

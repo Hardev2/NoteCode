@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import CodeBlockEditor, { normalizeCodeLanguage } from "./components/CodeBlockEditor";
 import CollapsibleSection from "./components/CollapsibleSection";
+import DocsEditor, { docHtmlPreview } from "./components/DocsEditor";
 import FolderSection from "./components/FolderSection";
 
 const storageKey = "notecode.notes.v1";
@@ -46,6 +47,14 @@ function normalizeSection(section) {
             content: typeof file.content === "string" ? file.content : "",
           }))
         : [],
+    };
+  }
+
+  if (section.type === "doc") {
+    return {
+      id: section.id ?? crypto.randomUUID(),
+      type: "doc",
+      content: typeof section.content === "string" ? section.content : "",
     };
   }
 
@@ -347,7 +356,35 @@ export default function App() {
             onChange={(e) => updateSection(activeNote.id, section.id, e.target.value)}
             placeholder="Type your label or note text here..."
             rows={Math.max(3, section.content.split("\n").length)}
-            className="custom-scrollbar text-lg font-bold block w-full resize-y border-0 bg-transparent px-4 py-3 leading-relaxed text-stone-800 outline-none placeholder:text-stone-400 focus:ring-0 dark:text-slate-200 dark:placeholder:text-slate-500"
+            className="custom-scrollbar block w-full resize-y border-0 bg-transparent px-4 py-3 text-xs font-normal leading-relaxed text-stone-800 outline-none placeholder:text-stone-400 focus:ring-0 dark:text-slate-200 dark:placeholder:text-slate-500"
+          />
+        </CollapsibleSection>
+      );
+    }
+
+    if (section.type === "doc") {
+      return (
+        <CollapsibleSection
+          key={section.id}
+          label="Doc"
+          collapsed={collapsed}
+          onToggle={() => toggleSectionCollapsed(section.id)}
+          preview={docHtmlPreview(section.content)}
+          shellClassName="overflow-hidden rounded-lg border border-blue-300/50 bg-white shadow-sm dark:border-blue-900/50 dark:bg-slate-900/50"
+          headerClassName="flex items-center justify-between gap-2 border-b border-stone-200/80 px-3 py-2 dark:border-slate-700/80"
+          headerActions={
+            <button
+              type="button"
+              onClick={() => deleteSection(activeNote.id, section.id)}
+              className="shrink-0 rounded-md border border-rose-300/60 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700 transition hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/60 dark:border-rose-900/60 dark:bg-rose-950/50 dark:text-rose-400 dark:hover:bg-rose-950/80 dark:focus-visible:ring-rose-500"
+            >
+              Remove
+            </button>
+          }
+        >
+          <DocsEditor
+            value={section.content}
+            onChange={(content) => updateSection(activeNote.id, section.id, content)}
           />
         </CollapsibleSection>
       );
@@ -514,6 +551,13 @@ export default function App() {
                   </button>
                   <button
                     type="button"
+                    onClick={() => addSection("doc")}
+                    className="rounded-lg border border-blue-400/60 bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 dark:border-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+                  >
+                    + Doc
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => addSection("code")}
                     className="rounded-lg border border-stone-600 bg-stone-700 px-4 py-2 text-sm font-medium text-stone-100 transition hover:bg-stone-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 dark:border-slate-500 dark:bg-slate-700 dark:hover:bg-slate-600 dark:focus-visible:ring-slate-400"
                   >
@@ -533,8 +577,8 @@ export default function App() {
                 <div className="flex w-full flex-col gap-5">
                   {activeNote.sections.length === 0 ? (
                     <p className="rounded-lg border border-dashed border-stone-300/80 px-4 py-8 text-center text-sm text-stone-500 dark:border-slate-700 dark:text-slate-500">
-                      No sections yet. Add <strong>Text</strong>, <strong>Code</strong>, or a{" "}
-                      <strong>Folder</strong>.
+                      No sections yet. Add <strong>Text</strong>, <strong>Doc</strong>,{" "}
+                      <strong>Code</strong>, or a <strong>Folder</strong>.
                     </p>
                   ) : null}
                   {activeNote.sections.map((section) => renderSection(section))}
