@@ -3,6 +3,7 @@ import CodeBlockEditor, { normalizeCodeLanguage } from "./components/CodeBlockEd
 import CollapsibleSection from "./components/CollapsibleSection";
 import DocsEditor, { docHtmlPreview } from "./components/DocsEditor";
 import FolderSection from "./components/FolderSection";
+import SectionList from "./components/SectionList";
 
 const storageKey = "notecode.notes.v1";
 const themeKey = "notecode.theme";
@@ -276,6 +277,19 @@ export default function App() {
     );
   };
 
+  const reorderSections = (noteId, fromIndex, toIndex) => {
+    if (fromIndex === toIndex) return;
+    setNotes((prev) =>
+      prev.map((note) => {
+        if (note.id !== noteId) return note;
+        const sections = [...note.sections];
+        const [moved] = sections.splice(fromIndex, 1);
+        sections.splice(toIndex, 0, moved);
+        return { ...note, sections, updatedAt: Date.now() };
+      })
+    );
+  };
+
   const updateFolderName = (noteId, sectionId, name) => {
     mapSections(noteId, (section) =>
       section.id === sectionId && section.type === "folder"
@@ -334,7 +348,6 @@ export default function App() {
     if (section.type === "label") {
       return (
         <CollapsibleSection
-          key={section.id}
           label="Text"
           collapsed={collapsed}
           onToggle={() => toggleSectionCollapsed(section.id)}
@@ -365,7 +378,6 @@ export default function App() {
     if (section.type === "doc") {
       return (
         <CollapsibleSection
-          key={section.id}
           label="Doc"
           collapsed={collapsed}
           onToggle={() => toggleSectionCollapsed(section.id)}
@@ -393,7 +405,6 @@ export default function App() {
     if (section.type === "folder") {
       return (
         <FolderSection
-          key={section.id}
           section={section}
           noteId={activeNote.id}
           onRemoveSection={deleteSection}
@@ -408,7 +419,6 @@ export default function App() {
 
     return (
       <CollapsibleSection
-        key={section.id}
         label="Code"
         collapsed={collapsed}
         onToggle={() => toggleSectionCollapsed(section.id)}
@@ -574,15 +584,20 @@ export default function App() {
               </div>
 
               <div className="custom-scrollbar flex-1 overflow-y-auto px-6 py-6">
-                <div className="flex w-full flex-col gap-5">
-                  {activeNote.sections.length === 0 ? (
-                    <p className="rounded-lg border border-dashed border-stone-300/80 px-4 py-8 text-center text-sm text-stone-500 dark:border-slate-700 dark:text-slate-500">
-                      No sections yet. Add <strong>Text</strong>, <strong>Doc</strong>,{" "}
-                      <strong>Code</strong>, or a <strong>Folder</strong>.
-                    </p>
-                  ) : null}
-                  {activeNote.sections.map((section) => renderSection(section))}
-                </div>
+                {activeNote.sections.length === 0 ? (
+                  <p className="rounded-lg border border-dashed border-stone-300/80 px-4 py-8 text-center text-sm text-stone-500 dark:border-slate-700 dark:text-slate-500">
+                    No sections yet. Add <strong>Text</strong>, <strong>Doc</strong>,{" "}
+                    <strong>Code</strong>, or a <strong>Folder</strong>.
+                  </p>
+                ) : (
+                  <SectionList
+                    sections={activeNote.sections}
+                    onReorder={(fromIndex, toIndex) =>
+                      reorderSections(activeNote.id, fromIndex, toIndex)
+                    }
+                    renderSection={renderSection}
+                  />
+                )}
               </div>
             </>
           )}
