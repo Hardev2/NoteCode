@@ -9,6 +9,8 @@ import "prismjs/components/prism-css";
 import "prismjs/components/prism-json";
 import "prismjs/components/prism-bash";
 import "prismjs/components/prism-python";
+import "prismjs/components/prism-markup-templating";
+import "prismjs/components/prism-php";
 import "prismjs/themes/prism-tomorrow.css";
 import "../styles/code-editor.css";
 
@@ -17,6 +19,7 @@ export const CODE_LANGUAGES = [
   { id: "html", label: "HTML" },
   { id: "css", label: "CSS" },
   { id: "json", label: "JSON" },
+  { id: "php", label: "PHP" },
   { id: "python", label: "Python" },
   { id: "bash", label: "Bash" },
 ];
@@ -28,6 +31,7 @@ const GRAMMARS = {
   html: languages.markup,
   css: languages.css,
   json: languages.json,
+  php: languages.php,
   python: languages.python,
   bash: languages.bash,
 };
@@ -37,6 +41,7 @@ const PRISM_IDS = {
   html: "markup",
   css: "css",
   json: "json",
+  php: "php",
   python: "python",
   bash: "bash",
 };

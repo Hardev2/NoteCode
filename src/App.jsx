@@ -455,6 +455,7 @@ export default function App() {
               <option value="html">HTML</option>
               <option value="css">CSS</option>
               <option value="json">JSON</option>
+              <option value="php">PHP</option>
               <option value="python">Python</option>
               <option value="bash">Bash</option>
             </select>
@@ -469,7 +470,7 @@ export default function App() {
                   ? formatState.message
                   : canFormatWithPrettier(section.language)
                     ? "Format code with Prettier"
-                    : "Prettier supports JavaScript, HTML, CSS, and JSON"
+                    : "Prettier supports JavaScript, HTML, CSS, JSON, and PHP"
               }
               onClick={() => formatSectionCode(section)}
               className="rounded-md border border-slate-600 bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-200 transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 disabled:cursor-not-allowed disabled:opacity-40"

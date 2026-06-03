@@ -5,6 +5,7 @@ const PARSER_BY_LANGUAGE = {
   html: "html",
   css: "css",
   json: "json",
+  php: "php",
 };
 
 async function loadPlugins(parser) {
@@ -23,6 +24,10 @@ async function loadPlugins(parser) {
     const postcss = await import("prettier/plugins/postcss");
     return [postcss.default];
   }
+  if (parser === "php") {
+    const php = await import("@prettier/plugin-php/standalone");
+    return [php.default ?? php];
+  }
   return [];
 }
 
@@ -38,7 +43,7 @@ export async function formatCodeWithPrettier(code, language) {
   if (!parser) {
     return {
       ok: false,
-      error: "Prettier supports JavaScript, HTML, CSS, and JSON only. Change the language dropdown to format.",
+      error: "Prettier supports JavaScript, HTML, CSS, JSON, and PHP only. Change the language dropdown to format.",
     };
   }
 

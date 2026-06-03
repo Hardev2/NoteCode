@@ -13,6 +13,7 @@
     "vite": "^8.0.12"
   },
   "dependencies": {
+    "@prettier/plugin-php": "^0.25.0",
     "@tailwindcss/vite": "^4.3.0",
     "@tiptap/extension-color": "^3.24.0",
     "@tiptap/extension-highlight": "^3.24.0",
