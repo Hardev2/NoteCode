@@ -4,6 +4,7 @@ import CollapsibleSection from "./components/CollapsibleSection";
 import DocsEditor, { docHtmlPreview } from "./components/DocsEditor";
 import FolderSection from "./components/FolderSection";
 import SectionList from "./components/SectionList";
+import { canFormatWithPrettier, formatCodeWithPrettier } from "./utils/formatCode";
 
 const storageKey = "notecode.notes.v1";
 const themeKey = "notecode.theme";
@@ -152,6 +153,7 @@ export default function App() {
   });
   const [activeId, setActiveId] = useState(notes[0]?.id ?? null);
   const [copiedBlockId, setCopiedBlockId] = useState("");
+  const [formatState, setFormatState] = useState({ sectionId: "", status: "" });
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const [collapsedSectionIds, setCollapsedSectionIds] = useState(() => new Set());
 
@@ -342,6 +344,20 @@ export default function App() {
     window.setTimeout(() => setCopiedBlockId(""), 1300);
   };
 
+  const formatSectionCode = async (section) => {
+    if (!activeNote) return;
+    setFormatState({ sectionId: section.id, status: "formatting" });
+    const result = await formatCodeWithPrettier(section.content, section.language);
+    if (result.ok) {
+      updateSection(activeNote.id, section.id, result.formatted);
+      setFormatState({ sectionId: section.id, status: "done" });
+      window.setTimeout(() => setFormatState({ sectionId: "", status: "" }), 1400);
+    } else {
+      setFormatState({ sectionId: section.id, status: "error", message: result.error });
+      window.setTimeout(() => setFormatState({ sectionId: "", status: "" }), 3200);
+    }
+  };
+
   const renderSection = (section) => {
     const collapsed = collapsedSectionIds.has(section.id);
 
@@ -442,6 +458,30 @@ export default function App() {
               <option value="python">Python</option>
               <option value="bash">Bash</option>
             </select>
+            <button
+              type="button"
+              disabled={
+                !canFormatWithPrettier(section.language) ||
+                (formatState.sectionId === section.id && formatState.status === "formatting")
+              }
+              title={
+                formatState.sectionId === section.id && formatState.status === "error"
+                  ? formatState.message
+                  : canFormatWithPrettier(section.language)
+                    ? "Format code with Prettier"
+                    : "Prettier supports JavaScript, HTML, CSS, and JSON"
+              }
+              onClick={() => formatSectionCode(section)}
+              className="rounded-md border border-slate-600 bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-200 transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {formatState.sectionId === section.id && formatState.status === "formatting"
+                ? "Formatting…"
+                : formatState.sectionId === section.id && formatState.status === "done"
+                  ? "Formatted!"
+                  : formatState.sectionId === section.id && formatState.status === "error"
+                    ? "Can't format"
+                    : "Format"}
+            </button>
             <button
               type="button"
               onClick={() => copyContent(section.content, section.id)}
